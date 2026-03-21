@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Hospital Setup — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Hospital Setup</span>
+            <h1>Complete Your <span class="gradient-text">Hospital Profile</span></h1>
+            <p class="section-subtitle">Provide your hospital details. Our admin will review and approve your listing.</p>
+        </div>
+        <form method="POST" action="/hospital/setup" class="auth-card glass-card" style="max-width:700px;margin:0 auto">
+            <div class="form-group"><label>Hospital Name</label><input type="text" name="name" required></div>
+            <div class="form-group"><label>Description</label><textarea name="description" rows="3"></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Country</label><input type="text" name="country" required></div>
+                <div class="form-group"><label>City</label><input type="text" name="city" required></div>
+            </div>
+            <div class="form-group"><label>Address</label><input type="text" name="address"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Phone</label><input type="text" name="phone"></div>
+                <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+            </div>
+            <div class="form-group"><label>Website</label><input type="url" name="website"></div>
+            <button type="submit" class="btn btn-primary btn-lg btn-glow btn-block">Submit for Approval</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

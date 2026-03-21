@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Admin Panel</span>
+            <h1>Platform <span class="gradient-text">Administration</span></h1>
+        </div>
+
+        <!-- Analytics -->
+        <div class="stats-grid" style="margin-bottom:2rem">
+            <div class="stat-card glass-card"><span class="stat-number">{{ stats.total_users }}</span><span class="stat-label">Total Users</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ stats.patients }}</span><span class="stat-label">Patients</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ stats.total_hospitals }}</span><span class="stat-label">Hospitals</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ stats.total_doctors }}</span><span class="stat-label">Doctors</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ stats.total_appointments }}</span><span class="stat-label">Appointments</span></div>
+            <div class="stat-card glass-card"><span class="stat-number" style="color:#f59e0b">{{ stats.pending_hospitals }}</span><span class="stat-label">Pending Approval</span></div>
+        </div>
+
+        <div class="dash-grid">
+            <!-- Pending Hospitals -->
+            {% if pending_hospitals %}
+            <div class="dash-panel glass-card full-width">
+                <h2>⏳ Pending Hospital Approvals</h2>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Hospital</th><th>Location</th><th>Submitted</th><th>Action</th></tr></thead>
+                        <tbody>
+                            {% for h in pending_hospitals %}
+                            <tr>
+                                <td><strong>{{ h.name }}</strong></td>
+                                <td>{{ h.city }}, {{ h.country }}</td>
+                                <td>{{ h.created_at.strftime('%b %d, %Y') }}</td>
+                                <td><a href="/admin/approve/{{ h.id }}" class="btn btn-sm btn-primary">✓ Approve</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- All Users -->
+            <div class="dash-panel glass-card full-width">
+                <h2>👤 User Management</h2>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Country</th><th>Joined</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td>{{ u.name }}</td>
+                                <td>{{ u.email }}</td>
+                                <td><span class="role-badge role-{{ u.role }}">{{ u.role|capitalize }}</span></td>
+                                <td>{{ u.country or '—' }}</td>
+                                <td>{{ u.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    {% if u.role != 'admin' %}
+                                    <a href="/admin/delete-user/{{ u.id }}" class="btn btn-sm btn-outline" style="border-color:#ef4444;color:#ef4444" onclick="return confirm('Delete this user?')">Delete</a>
+                                    {% else %}<span class="muted-text">Admin</span>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- All Hospitals -->
+            <div class="dash-panel glass-card full-width">
+                <h2>🏥 All Hospitals</h2>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Hospital</th><th>Location</th><th>Rating</th><th>Doctors</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for h in hospitals %}
+                            <tr>
+                                <td><a href="/hospital/{{ h.id }}">{{ h.name }}</a></td>
+                                <td>{{ h.city }}, {{ h.country }}</td>
+                                <td>⭐ {{ h.rating }}</td>
+                                <td>{{ h.doctors|length }}</td>
+                                <td><span class="status-badge status-{{ 'confirmed' if h.is_approved else 'pending' }}">{{ 'Approved' if h.is_approved else 'Pending' }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="dash-panel glass-card full-width">
+                <h2>📅 Recent Appointments</h2>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Patient</th><th>Hospital</th><th>Treatment</th><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for a in appointments %}
+                            <tr>
+                                <td>{{ a.patient.name }}</td>
+                                <td>{{ a.hospital.name }}</td>
+                                <td>{{ a.treatment_name or 'General' }}</td>
+                                <td>{{ a.preferred_date.strftime('%b %d, %Y') if a.preferred_date else '—' }}</td>
+                                <td><span class="status-badge status-{{ a.status }}">{{ a.status|capitalize }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

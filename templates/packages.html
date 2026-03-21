@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Packages — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Medical Tourism Packages</span>
+            <h1>All-Inclusive <span class="gradient-text">Care Packages</span></h1>
+            <p class="section-subtitle">Treatment + hotel + airport transfer + translator + post-care — all bundled for convenience.</p>
+        </div>
+        <div class="card-grid">
+            {% for p in packages %}
+            <div class="pkg-card glass-card">
+                <div class="pkg-header"><img src="{{ p.image }}" alt="{{ p.name }}" class="pkg-img"></div>
+                <div class="pkg-body">
+                    <h3>{{ p.name }}</h3>
+                    <p class="pkg-hospital">🏥 {{ p.hospital.name }} · {{ p.hospital.city }}, {{ p.hospital.country }}</p>
+                    <p class="pkg-desc">{{ p.description }}</p>
+                    <p class="pkg-treatment">💊 {{ p.treatment_name }}</p>
+                    <div class="pkg-includes">
+                        {% if p.includes_hotel %}<span class="inc">🏨 {{ p.hotel_details }}</span>{% endif %}
+                        {% if p.includes_airport_pickup %}<span class="inc">✈️ Airport Pickup</span>{% endif %}
+                        {% if p.includes_translator %}<span class="inc">🗣️ Translator</span>{% endif %}
+                        {% if p.includes_post_care %}<span class="inc">💊 Post-Treatment Care</span>{% endif %}
+                    </div>
+                    <div class="pkg-footer">
+                        <span class="pkg-price">${{ "{:,.0f}".format(p.price) }}</span>
+                        <span class="pkg-dur">📅 {{ p.duration_days }} days</span>
+                    </div>
+                    <a href="/hospital/{{ p.hospital_id }}" class="btn btn-primary btn-sm btn-block" style="margin-top:1rem">Book This Package →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if not packages %}<div class="empty-state glass-card"><div class="empty-icon">📦</div><h2>No packages available</h2></div>{% endif %}
+    </div>
+</section>
+{% endblock %}

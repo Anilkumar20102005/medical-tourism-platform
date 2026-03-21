@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Hospital Dashboard — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Hospital Dashboard</span>
+            <h1>{{ hospital.name }} <span class="gradient-text">Management</span></h1>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid" style="margin-bottom:2rem">
+            <div class="stat-card glass-card"><span class="stat-number">{{ hospital.doctors|length }}</span><span class="stat-label">Doctors</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ hospital.treatments|length }}</span><span class="stat-label">Treatments</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ hospital.packages|length }}</span><span class="stat-label">Packages</span></div>
+            <div class="stat-card glass-card"><span class="stat-number">{{ appointments|length }}</span><span class="stat-label">Appointments</span></div>
+        </div>
+
+        <div class="dash-grid">
+            <!-- Appointment Management -->
+            <div class="dash-panel glass-card full-width">
+                <h2>📅 Patient Appointments</h2>
+                {% if appointments %}
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Patient</th><th>Treatment</th><th>Date</th><th>Notes</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            {% for a in appointments %}
+                            <tr>
+                                <td>{{ a.patient.name }}</td>
+                                <td>{{ a.treatment_name or 'General' }}</td>
+                                <td>{{ a.preferred_date.strftime('%b %d, %Y') if a.preferred_date else '—' }}</td>
+                                <td><small>{{ a.notes[:60] if a.notes else '—' }}</small></td>
+                                <td><span class="status-badge status-{{ a.status }}">{{ a.status|capitalize }}</span></td>
+                                <td>
+                                    {% if a.status == 'pending' %}
+                                    <a href="/hospital/appointment/{{ a.id }}/confirmed" class="btn btn-sm btn-primary">✓ Confirm</a>
+                                    <a href="/hospital/appointment/{{ a.id }}/rejected" class="btn btn-sm btn-outline" style="border-color:#ef4444;color:#ef4444">✕ Reject</a>
+                                    {% elif a.status == 'confirmed' %}
+                                    <a href="/hospital/appointment/{{ a.id }}/completed" class="btn btn-sm btn-outline">✓ Complete</a>
+                                    {% else %}
+                                    <span class="muted-text">{{ a.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="muted-text">No appointments yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Add Doctor -->
+            <div class="dash-panel glass-card">
+                <h2>👨‍⚕️ Add Doctor</h2>
+                <form method="POST" action="/hospital/doctor/add" class="stacked-form">
+                    <input type="text" name="name" placeholder="Doctor name" required>
+                    <input type="text" name="specialty" placeholder="Specialty" required>
+                    <input type="text" name="qualifications" placeholder="Qualifications">
+                    <input type="number" name="experience_years" placeholder="Experience (years)">
+                    <textarea name="bio" placeholder="Bio" rows="2"></textarea>
+                    <input type="text" name="languages" placeholder="Languages (comma-separated)">
+                    <input type="number" name="consultation_fee" placeholder="Fee ($)" step="0.01">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block">Add Doctor</button>
+                </form>
+            </div>
+
+            <!-- Add Package -->
+            <div class="dash-panel glass-card">
+                <h2>📦 Add Package</h2>
+                <form method="POST" action="/hospital/package/add" class="stacked-form">
+                    <input type="text" name="name" placeholder="Package name" required>
+                    <textarea name="description" placeholder="Description" rows="2"></textarea>
+                    <input type="text" name="treatment_name" placeholder="Treatment included">
+                    <input type="number" name="price" placeholder="Price ($)" step="0.01" required>
+                    <input type="number" name="duration_days" placeholder="Duration (days)" value="7">
+                    <input type="text" name="hotel_details" placeholder="Hotel details">
+                    <div class="checkbox-row">
+                        <label><input type="checkbox" name="hotel" checked> 🏨 Hotel</label>
+                        <label><input type="checkbox" name="airport" checked> ✈️ Transfer</label>
+                        <label><input type="checkbox" name="translator"> 🗣️ Translator</label>
+                        <label><input type="checkbox" name="postcare" checked> 💊 Post-Care</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm btn-block">Add Package</button>
+                </form>
+            </div>
+
+            <!-- Messages -->
+            <div class="dash-panel glass-card full-width">
+                <h2>💬 Patient Messages</h2>
+                {% if messages %}
+                <div class="msg-list">
+                    {% for m in messages %}
+                    <div class="msg-item {% if not m.is_read %}msg-unread{% endif %}">
+                        <strong>{{ m.sender.name }}</strong>
+                        <p>{{ m.content }}</p>
+                        <small>{{ m.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="muted-text">No messages yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

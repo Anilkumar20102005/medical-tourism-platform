@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Patient Dashboard — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Patient Dashboard</span>
+            <h1>Welcome, <span class="gradient-text">{{ current_user.name }}</span></h1>
+        </div>
+
+        <div class="dash-grid">
+            <!-- Appointments -->
+            <div class="dash-panel glass-card">
+                <h2>📅 My Appointments</h2>
+                {% if appointments %}
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Hospital</th><th>Treatment</th><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for a in appointments %}
+                            <tr>
+                                <td>{{ a.hospital.name }}</td>
+                                <td>{{ a.treatment_name or 'General' }}</td>
+                                <td>{{ a.preferred_date.strftime('%b %d, %Y') if a.preferred_date else '—' }}</td>
+                                <td><span class="status-badge status-{{ a.status }}">{{ a.status|capitalize }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="muted-text">No appointments yet. <a href="/hospitals">Browse hospitals</a> to book one.</p>
+                {% endif %}
+            </div>
+
+            <!-- Medical Records -->
+            <div class="dash-panel glass-card">
+                <h2>📂 Medical Records</h2>
+                {% if records %}
+                <ul class="record-list">
+                    {% for r in records %}
+                    <li><span>📄 {{ r.original_name }}</span><small>{{ r.uploaded_at.strftime('%b %d, %Y') }} · {{ r.file_type|upper }}</small></li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="muted-text">No records uploaded yet.</p>
+                {% endif %}
+                <form method="POST" action="/patient/upload" enctype="multipart/form-data" class="upload-form">
+                    <input type="file" name="record_file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+                    <button type="submit" class="btn btn-sm btn-outline">Upload Record</button>
+                </form>
+            </div>
+
+            <!-- Messages -->
+            <div class="dash-panel glass-card full-width">
+                <h2>💬 Messages</h2>
+                {% if messages %}
+                <div class="msg-list">
+                    {% for m in messages %}
+                    <div class="msg-item {% if not m.is_read %}msg-unread{% endif %}">
+                        <p>{{ m.content }}</p>
+                        <small>{{ m.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="muted-text">No messages yet.</p>
+                {% endif %}
+                <form method="POST" action="/patient/message" class="msg-form">
+                    <div class="form-row">
+                        <select name="hospital_id" required>
+                            <option value="" disabled selected>Select hospital…</option>
+                            {% for h in current_user.appointments|map(attribute='hospital')|unique|list %}
+                            <option value="{{ h.user_id }}" data-hid="{{ h.id }}">{{ h.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="receiver_id" value="">
+                        <input type="text" name="content" placeholder="Type your message…" required>
+                        <button type="submit" class="btn btn-sm btn-primary">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

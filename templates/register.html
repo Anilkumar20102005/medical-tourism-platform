@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <h1>Create Your <span class="gradient-text">Account</span></h1>
+                <p>Join HealinBelieve as a patient or medical provider</p>
+            </div>
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="John Smith" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Min 6 characters" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <select id="country" name="country" required>
+                        <option value="" disabled selected>Select…</option>
+                        <option value="India">🇮🇳 India</option>
+                        <option value="USA">🇺🇸 United States</option>
+                        <option value="UK">🇬🇧 United Kingdom</option>
+                        <option value="Germany">🇩🇪 Germany</option>
+                        <option value="Thailand">🇹🇭 Thailand</option>
+                        <option value="South Korea">🇰🇷 South Korea</option>
+                        <option value="Turkey">🇹🇷 Turkey</option>
+                        <option value="Singapore">🇸🇬 Singapore</option>
+                        <option value="UAE">🇦🇪 UAE</option>
+                        <option value="Australia">🇦🇺 Australia</option>
+                        <option value="Brazil">🇧🇷 Brazil</option>
+                        <option value="Japan">🇯🇵 Japan</option>
+                        <option value="Malaysia">🇲🇾 Malaysia</option>
+                        <option value="Mexico">🇲🇽 Mexico</option>
+                        <option value="Spain">🇪🇸 Spain</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role">I am a…</label>
+                    <div class="role-picker">
+                        <label class="role-option"><input type="radio" name="role" value="patient" checked> <span class="role-btn">🧑‍⚕️ Patient</span></label>
+                        <label class="role-option"><input type="radio" name="role" value="hospital"> <span class="role-btn">🏥 Hospital / Provider</span></label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block btn-glow">Create Account</button>
+            </form>
+            <p class="auth-footer">Already have an account? <a href="/login">Log in →</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

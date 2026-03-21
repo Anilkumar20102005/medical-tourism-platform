@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Cost Comparison — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Cost Comparison</span>
+            <h1>Compare <span class="gradient-text">Treatment Costs</span></h1>
+            <p class="section-subtitle">See how treatment prices differ across hospitals and countries</p>
+        </div>
+
+        <!-- Filter by category -->
+        <div class="filter-bar glass-card" style="margin-bottom:1.5rem">
+            <div class="filter-btns" id="compareCatFilter">
+                <button class="filter-btn active" data-cat="all">All</button>
+                {% for c in categories %}<button class="filter-btn" data-cat="{{ c }}">{{ c }}</button>{% endfor %}
+            </div>
+        </div>
+
+        <div class="compare-grid" id="compareGrid">
+            {% set ns = namespace(categories_shown=[]) %}
+            {% for cat in categories %}
+            <div class="compare-category" data-cat="{{ cat }}">
+                <h2 class="compare-cat-title">{{ cat }}</h2>
+                <div class="table-wrap glass-card">
+                    <table class="data-table">
+                        <thead><tr><th>Treatment</th><th>Hospital</th><th>Country</th><th>Min Cost</th><th>Max Cost</th><th>Duration</th><th>Success</th></tr></thead>
+                        <tbody>
+                            {% for t in treatments if t.category == cat %}
+                            <tr>
+                                <td><strong>{{ t.name }}</strong></td>
+                                <td>{{ t.hospital.name }}</td>
+                                <td>{{ t.hospital.country }}</td>
+                                <td class="price-cell">${{ "{:,.0f}".format(t.min_cost) }}</td>
+                                <td class="price-cell">${{ "{:,.0f}".format(t.max_cost) }}</td>
+                                <td>{{ t.duration_days }} days</td>
+                                <td>{% if t.success_rate %}{{ t.success_rate }}%{% else %}—{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Country comparison summary -->
+        <div class="detail-section">
+            <h2>Average Cost by <span class="gradient-text">Country</span></h2>
+            <div class="stats-grid" style="margin-top:1.5rem">
+                {% set countries_seen = [] %}
+                {% for t in treatments %}
+                {% if t.hospital.country not in countries_seen %}
+                {% set _ = countries_seen.append(t.hospital.country) %}
+                <div class="stat-card glass-card">
+                    <span class="stat-number" style="font-size:1.2rem">${{
+                        "{:,.0f}".format(
+                            (treatments|selectattr('hospital.country','equalto',t.hospital.country)|map(attribute='min_cost')|list|sum) /
+                            (treatments|selectattr('hospital.country','equalto',t.hospital.country)|list|length)
+                        )
+                    }}</span>
+                    <span class="stat-label">{{ t.hospital.country }} (avg min)</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('#compareCatFilter .filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#compareCatFilter .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.cat;
+        document.querySelectorAll('.compare-category').forEach(el => {
+            el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

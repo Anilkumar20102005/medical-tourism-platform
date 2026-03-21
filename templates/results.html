@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Match Results — HealinBelieve{% endblock %}
+
+{% block content %}
+<section class="section results-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">AI Match Results</span>
+            <h1>Your Top <span class="gradient-text">Doctor Matches</span></h1>
+            <p class="section-subtitle">Ranked by our AI matching algorithm based on your specific needs.</p>
+        </div>
+
+        <!-- Empty state (shown before form submission) -->
+        <div class="results-empty glass-card" id="resultsEmpty">
+            <div class="empty-icon">🔍</div>
+            <h2>No Results Yet</h2>
+            <p>Head to our <a href="/finder">Doctor Finder</a> to submit your preferences and get AI-matched results.</p>
+            <a href="/finder" class="btn btn-primary btn-glow">Go to Doctor Finder →</a>
+        </div>
+
+        <!-- Results container (populated by JS) -->
+        <div class="results-list" id="resultsList" hidden></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const data = sessionStorage.getItem('matchResults');
+    if (!data) return;
+    const results = JSON.parse(data);
+    if (!results.length) return;
+
+    document.getElementById('resultsEmpty').hidden = true;
+    const list = document.getElementById('resultsList');
+    list.hidden = false;
+
+    results.forEach((r, i) => {
+        const d = r.doctor;
+        // Parse languages safely — comes as JSON string from API
+        let langs = [];
+        try { langs = typeof d.languages === 'string' ? JSON.parse(d.languages) : (d.languages || []); } catch(e) { langs = []; }
+
+        const card = document.createElement('div');
+        card.className = 'result-card glass-card';
+        card.style.animationDelay = `${i * 0.12}s`;
+
+        card.innerHTML = `
+            <div class="result-rank">#${i + 1}</div>
+            <div class="result-main">
+                <div class="result-header">
+                    <img src="${d.image || 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(d.name)}" alt="${d.name}" class="result-avatar">
+                    <div>
+                        <h2>${d.name}</h2>
+                        <p class="result-meta">${d.specialty} · ${d.city || ''}, ${d.country}</p>
+                        <p class="result-meta">⭐ ${d.rating} (${d.review_count || 0} reviews) · ${d.experience_years} yrs exp · $${d.consultation_fee}/consult</p>
+                    </div>
+                    <div class="result-score-circle">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" class="circle-bg"/>
+                            <circle cx="60" cy="60" r="54" class="circle-fill" style="--percent:${r.overall_score}"/>
+                        </svg>
+                        <span class="match-pct">${r.overall_score}%</span>
+                    </div>
+                </div>
+                <div class="result-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-label"><span>🎯 Specialty Match</span><span>${r.breakdown.specialty.score}%</span></div>
+                        <div class="bar"><div class="bar-fill" style="--w:${r.breakdown.specialty.score}%"></div></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label"><span>💰 Budget Fit</span><span>${r.breakdown.budget.score}%</span></div>
+                        <div class="bar"><div class="bar-fill bar-fill-green" style="--w:${r.breakdown.budget.score}%"></div></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label"><span>📍 Location</span><span>${r.breakdown.location.score}%</span></div>
+                        <div class="bar"><div class="bar-fill bar-fill-amber" style="--w:${r.breakdown.location.score}%"></div></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label"><span>🎓 Experience</span><span>${r.breakdown.experience.score}%</span></div>
+                        <div class="bar"><div class="bar-fill bar-fill-purple" style="--w:${r.breakdown.experience.score}%"></div></div>
+                    </div>
+                </div>
+                <div class="result-details">
+                    <p class="result-bio">${d.bio || ''}</p>
+                    <div class="result-tags">
+                        ${langs.length ? `<span class="tag">🗣️ ${langs.join(', ')}</span>` : ''}
+                        ${d.qualifications ? `<span class="tag tag-cert">📜 ${d.qualifications}</span>` : ''}
+                        ${d.hospital_name ? `<span class="tag">🏥 ${d.hospital_name}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+});
+</script>
+{% endblock %}

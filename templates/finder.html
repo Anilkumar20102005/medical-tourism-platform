@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Find Your Doctor — HealinBelieve{% endblock %}
+
+{% block content %}
+<section class="section finder-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">AI Doctor Finder</span>
+            <h1>Tell Us About <span class="gradient-text">Your Needs</span></h1>
+            <p class="section-subtitle">Fill in your medical requirements and our AI engine will match you with the best specialists worldwide.</p>
+        </div>
+
+        <div class="finder-wrapper">
+            <form class="finder-form glass-card" id="matchForm">
+                <!-- Specialty / Condition -->
+                <div class="form-group">
+                    <label for="specialty">Medical Specialty Needed</label>
+                    <select id="specialty" name="specialty" required>
+                        <option value="" disabled selected>Select a specialty…</option>
+                        <option value="Orthopedics">🦴 Orthopedics (Bones &amp; Joints)</option>
+                        <option value="Cardiology">❤️ Cardiology (Heart)</option>
+                        <option value="Dermatology">🧴 Dermatology (Skin)</option>
+                        <option value="Neurology">🧠 Neurology (Brain &amp; Nerves)</option>
+                        <option value="Oncology">🎗️ Oncology (Cancer)</option>
+                        <option value="Ophthalmology">👁️ Ophthalmology (Eyes)</option>
+                    </select>
+                </div>
+
+                <!-- Budget -->
+                <div class="form-group">
+                    <label for="budget">Your Budget (USD per consultation)</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">💲</span>
+                        <input type="number" id="budget" name="budget" placeholder="e.g. 200" min="10" required>
+                    </div>
+                    <small class="form-hint">Our doctors' fees range from $90 – $250</small>
+                </div>
+
+                <!-- Country -->
+                <div class="form-group">
+                    <label for="country">Your Country / Region</label>
+                    <select id="country" name="country" required>
+                        <option value="" disabled selected>Select your country…</option>
+                        <option value="India">🇮🇳 India</option>
+                        <option value="USA">🇺🇸 United States</option>
+                        <option value="UK">🇬🇧 United Kingdom</option>
+                        <option value="Germany">🇩🇪 Germany</option>
+                        <option value="Thailand">🇹🇭 Thailand</option>
+                        <option value="South Korea">🇰🇷 South Korea</option>
+                        <option value="Turkey">🇹🇷 Turkey</option>
+                        <option value="Singapore">🇸🇬 Singapore</option>
+                        <option value="UAE">🇦🇪 UAE</option>
+                        <option value="Australia">🇦🇺 Australia</option>
+                        <option value="Brazil">🇧🇷 Brazil</option>
+                        <option value="Japan">🇯🇵 Japan</option>
+                        <option value="Malaysia">🇲🇾 Malaysia</option>
+                        <option value="Mexico">🇲🇽 Mexico</option>
+                        <option value="Spain">🇪🇸 Spain</option>
+                    </select>
+                </div>
+
+                <!-- Experience Preference -->
+                <div class="form-group">
+                    <label for="min_experience">Preferred Minimum Experience (years)</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">🎓</span>
+                        <input type="number" id="min_experience" name="min_experience" placeholder="e.g. 10" min="0" max="40" required>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary btn-lg btn-glow btn-block" id="submitMatch">
+                    <span class="btn-text">🤖 Find My Best Matches</span>
+                    <span class="btn-loader" hidden>
+                        <span class="spinner"></span> Analyzing…
+                    </span>
+                </button>
+            </form>
+
+            <!-- Matching factors sidebar -->
+            <aside class="finder-sidebar">
+                <div class="sidebar-card glass-card">
+                    <h3>How We Score</h3>
+                    <div class="weight-list">
+                        <div class="weight-item">
+                            <div class="weight-header">
+                                <span>🎯 Specialty Match</span>
+                                <span class="weight-pct">35%</span>
+                            </div>
+                            <div class="weight-bar"><div class="weight-fill" style="--w:35%"></div></div>
+                        </div>
+                        <div class="weight-item">
+                            <div class="weight-header">
+                                <span>💰 Budget Fit</span>
+                                <span class="weight-pct">25%</span>
+                            </div>
+                            <div class="weight-bar"><div class="weight-fill" style="--w:25%"></div></div>
+                        </div>
+                        <div class="weight-item">
+                            <div class="weight-header">
+                                <span>🎓 Experience</span>
+                                <span class="weight-pct">25%</span>
+                            </div>
+                            <div class="weight-bar"><div class="weight-fill" style="--w:25%"></div></div>
+                        </div>
+                        <div class="weight-item">
+                            <div class="weight-header">
+                                <span>📍 Location</span>
+                                <span class="weight-pct">15%</span>
+                            </div>
+                            <div class="weight-bar"><div class="weight-fill" style="--w:15%"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-card glass-card">
+                    <h3>Quick Tips</h3>
+                    <ul class="tips-list">
+                        <li>Be honest about your budget for accurate scoring</li>
+                        <li>Location scoring rewards nearby countries too</li>
+                        <li>Lower experience preference can widen your matches</li>
+                        <li>All doctors in our network are board-certified</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

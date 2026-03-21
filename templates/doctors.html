@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Doctors — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Our Doctors</span>
+            <h1>World-Class <span class="gradient-text">Specialists</span></h1>
+            <p class="section-subtitle">Find your ideal doctor by specialty. All doctors are board-certified with international credentials.</p>
+        </div>
+        <div class="filter-bar glass-card">
+            <form class="filter-form" method="GET" action="/doctors">
+                <select name="specialty" onchange="this.form.submit()">
+                    <option value="">All Specialties</option>
+                    {% for s in specialties %}<option value="{{ s }}" {% if selected_specialty==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="card-grid">
+            {% for d in doctors %}
+            <div class="doc-card glass-card">
+                <div class="doc-top">
+                    <img src="{{ d.image or 'https://api.dicebear.com/7.x/initials/svg?seed=' ~ d.name }}" alt="{{ d.name }}" class="doc-img">
+                    <div>
+                        <h3>{{ d.name }}</h3>
+                        <p class="doc-spec">{{ d.specialty }}</p>
+                        <p class="doc-hospital">🏥 {{ d.hospital.name }}</p>
+                        <p class="doc-loc">📍 {{ d.hospital.city }}, {{ d.hospital.country }}</p>
+                    </div>
+                </div>
+                <div class="doc-stats-row">
+                    <span>🎓 {{ d.experience_years }} yrs</span><span>⭐ {{ d.rating }}</span><span>💰 ${{ d.consultation_fee }}</span>
+                </div>
+                <p class="doc-bio">{{ d.bio[:130] }}…</p>
+                <p class="doc-qual">📜 {{ d.qualifications }}</p>
+                <div class="doc-langs">🗣️ {{ d.languages|from_json|join(', ') }}</div>
+                <a href="/hospital/{{ d.hospital_id }}" class="btn btn-outline btn-sm btn-block">View Hospital →</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% if not doctors %}<div class="empty-state glass-card"><div class="empty-icon">👨‍⚕️</div><h2>No doctors found</h2><p>Try a different specialty.</p></div>{% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Treatments — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Treatment Search</span>
+            <h1>Find Your <span class="gradient-text">Treatment</span></h1>
+            <p class="section-subtitle">Search medical procedures by category, country, and budget.</p>
+        </div>
+        <div class="filter-bar glass-card">
+            <form class="filter-form" method="GET" action="/treatments">
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for c in categories %}<option value="{{ c }}" {% if selected_category==c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+                </select>
+                <select name="country" onchange="this.form.submit()">
+                    <option value="">All Countries</option>
+                    {% for c in countries %}<option value="{{ c }}" {% if selected_country==c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+                </select>
+                <div class="filter-input-group">
+                    <input type="number" name="max_price" placeholder="Max price ($)" value="{{ selected_max_price }}">
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+        <div class="table-wrap glass-card">
+            <table class="data-table">
+                <thead><tr><th>Treatment</th><th>Hospital</th><th>Country</th><th>Cost Range</th><th>Duration</th><th>Success</th><th></th></tr></thead>
+                <tbody>
+                    {% for t in treatments %}
+                    <tr>
+                        <td><strong>{{ t.name }}</strong><br><small class="muted-text">{{ t.category }}</small></td>
+                        <td>{{ t.hospital.name }}</td>
+                        <td>{{ t.hospital.country }}</td>
+                        <td class="price-cell">${{ "{:,.0f}".format(t.min_cost) }} – ${{ "{:,.0f}".format(t.max_cost) }}</td>
+                        <td>{{ t.duration_days }} days</td>
+                        <td>{% if t.success_rate %}<span class="success-badge">{{ t.success_rate }}%</span>{% else %}—{% endif %}</td>
+                        <td><a href="/hospital/{{ t.hospital_id }}" class="btn btn-outline btn-sm">View →</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not treatments %}<div class="empty-state glass-card"><div class="empty-icon">🔬</div><h2>No treatments found</h2><p>Try adjusting your filters.</p></div>{% endif %}
+    </div>
+</section>
+{% endblock %}

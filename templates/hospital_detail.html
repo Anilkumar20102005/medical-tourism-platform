@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}{{ hospital.name }} — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <!-- Hospital Header -->
+        <div class="detail-header glass-card">
+            <div class="detail-top">
+                <img src="{{ hospital.image }}" alt="{{ hospital.name }}" class="detail-img">
+                <div class="detail-info">
+                    <h1>{{ hospital.name }}</h1>
+                    <p class="detail-loc">📍 {{ hospital.city }}, {{ hospital.country }}</p>
+                    <div class="detail-rating">⭐ {{ hospital.rating }} <span>({{ hospital.review_count }} reviews)</span></div>
+                    <div class="detail-tags">{% for s in hospital.specialties|from_json %}<span class="tag">{{ s }}</span>{% endfor %}</div>
+                    <div class="detail-accred">{% for a in hospital.accreditations|from_json %}<span class="tag tag-cert">✅ {{ a }}</span>{% endfor %}</div>
+                </div>
+            </div>
+            <p class="detail-desc">{{ hospital.description }}</p>
+            <div class="detail-contact">
+                {% if hospital.phone %}<span>📞 {{ hospital.phone }}</span>{% endif %}
+                {% if hospital.email %}<span>📧 {{ hospital.email }}</span>{% endif %}
+                {% if hospital.website %}<span>🌐 <a href="{{ hospital.website }}" target="_blank">Website</a></span>{% endif %}
+            </div>
+        </div>
+
+        <!-- Doctors -->
+        {% if hospital.doctors %}
+        <div class="detail-section">
+            <h2>Our <span class="gradient-text">Doctors</span></h2>
+            <div class="card-grid">
+                {% for d in hospital.doctors %}
+                <div class="doc-card glass-card">
+                    <div class="doc-top">
+                        <img src="{{ d.image or 'https://api.dicebear.com/7.x/initials/svg?seed=' ~ d.name }}" alt="{{ d.name }}" class="doc-img">
+                        <div>
+                            <h3>{{ d.name }}</h3>
+                            <p class="doc-spec">{{ d.specialty }}</p>
+                            <p class="doc-qual">{{ d.qualifications }}</p>
+                        </div>
+                    </div>
+                    <div class="doc-stats-row">
+                        <span>{{ d.experience_years }} yrs exp</span>
+                        <span>⭐ {{ d.rating }} ({{ d.review_count }})</span>
+                        <span>${{ d.consultation_fee }}</span>
+                    </div>
+                    <p class="doc-bio">{{ d.bio[:150] }}…</p>
+                    <div class="doc-langs">🗣️ {{ d.languages|from_json|join(', ') }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Treatments -->
+        {% if hospital.treatments %}
+        <div class="detail-section">
+            <h2>Available <span class="gradient-text">Treatments</span></h2>
+            <div class="table-wrap glass-card">
+                <table class="data-table">
+                    <thead><tr><th>Treatment</th><th>Category</th><th>Cost Range</th><th>Duration</th><th>Success Rate</th></tr></thead>
+                    <tbody>
+                        {% for t in hospital.treatments %}
+                        <tr>
+                            <td><strong>{{ t.name }}</strong><br><small>{{ t.description[:80] }}…</small></td>
+                            <td><span class="tag">{{ t.category }}</span></td>
+                            <td>${{ "{:,.0f}".format(t.min_cost) }} – ${{ "{:,.0f}".format(t.max_cost) }}</td>
+                            <td>{{ t.duration_days }} days</td>
+                            <td>{% if t.success_rate %}{{ t.success_rate }}%{% else %}—{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Packages -->
+        {% if hospital.packages %}
+        <div class="detail-section">
+            <h2>Tourism <span class="gradient-text">Packages</span></h2>
+            <div class="card-grid">
+                {% for p in hospital.packages %}
+                <div class="pkg-card glass-card">
+                    <div class="pkg-body">
+                        <h3>{{ p.name }}</h3>
+                        <p class="pkg-desc">{{ p.description[:120] }}…</p>
+                        <div class="pkg-includes">
+                            {% if p.includes_hotel %}<span class="inc">🏨 {{ p.hotel_details }}</span>{% endif %}
+                            {% if p.includes_airport_pickup %}<span class="inc">✈️ Airport Pickup</span>{% endif %}
+                            {% if p.includes_translator %}<span class="inc">🗣️ Translator</span>{% endif %}
+                            {% if p.includes_post_care %}<span class="inc">💊 Post-Care</span>{% endif %}
+                        </div>
+                        <div class="pkg-footer"><span class="pkg-price">${{ "{:,.0f}".format(p.price) }}</span><span class="pkg-dur">{{ p.duration_days }} days</span></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Book Appointment -->
+        {% if current_user.is_authenticated and current_user.role == 'patient' %}
+        <div class="detail-section">
+            <h2>Book an <span class="gradient-text">Appointment</span></h2>
+            <form method="POST" action="/patient/book" class="booking-form glass-card">
+                <input type="hidden" name="hospital_id" value="{{ hospital.id }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="doctor_id">Doctor (optional)</label>
+                        <select id="doctor_id" name="doctor_id">
+                            <option value="">Any available doctor</option>
+                            {% for d in hospital.doctors %}<option value="{{ d.id }}">{{ d.name }} — {{ d.specialty }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment_name">Treatment</label>
+                        <select id="treatment_name" name="treatment_name">
+                            <option value="">General Consultation</option>
+                            {% for t in hospital.treatments %}<option value="{{ t.name }}">{{ t.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="preferred_date">Preferred Date</label>
+                        <input type="date" id="preferred_date" name="preferred_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Tell us about your condition…"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-glow">📅 Book Appointment</button>
+            </form>
+        </div>
+        {% elif not current_user.is_authenticated %}
+        <div class="detail-section" style="text-align:center">
+            <a href="/login" class="btn btn-primary btn-lg btn-glow">Login to Book an Appointment</a>
+        </div>
+        {% endif %}
+
+        <!-- Reviews -->
+        <div class="detail-section">
+            <h2>Patient <span class="gradient-text">Reviews</span></h2>
+            {% if hospital.reviews %}
+            <div class="reviews-list">
+                {% for r in hospital.reviews %}
+                <div class="review-card glass-card">
+                    <div class="review-top"><strong>{{ r.patient_user.name }}</strong><span>{% for _ in range(r.rating) %}⭐{% endfor %} {{ r.rating }}/5</span></div>
+                    <p>{{ r.comment }}</p>
+                    <small>{{ r.created_at.strftime('%b %d, %Y') }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted-text">No reviews yet.</p>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.role == 'patient' %}
+            <form method="POST" action="/review/{{ hospital.id }}" class="review-form glass-card">
+                <h3>Leave a Review</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <select name="rating"><option value="5">⭐⭐⭐⭐⭐ 5</option><option value="4">⭐⭐⭐⭐ 4</option><option value="3">⭐⭐⭐ 3</option><option value="2">⭐⭐ 2</option><option value="1">⭐ 1</option></select>
+                    </div>
+                    <div class="form-group" style="flex:2">
+                        <label>Comment</label>
+                        <input type="text" name="comment" placeholder="Share your experience…">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-outline btn-sm">Submit Review</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

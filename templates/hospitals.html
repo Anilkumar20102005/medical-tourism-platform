@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Hospitals — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Hospitals</span>
+            <h1>Accredited <span class="gradient-text">Hospitals Worldwide</span></h1>
+            <p class="section-subtitle">Browse JCI-accredited hospitals across 5 countries. Filter by location or specialty.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar glass-card">
+            <form class="filter-form" method="GET" action="/hospitals">
+                <select name="country" onchange="this.form.submit()">
+                    <option value="">All Countries</option>
+                    {% for c in countries %}<option value="{{ c }}" {% if selected_country==c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+                </select>
+                <select name="specialty" onchange="this.form.submit()">
+                    <option value="">All Specialties</option>
+                    {% for s in ['Cardiology','Orthopedics','Oncology','Neurology','Cosmetic Surgery','Dental Care','Fertility','Hair Transplant','Ophthalmology','Robotic Surgery'] %}
+                    <option value="{{ s }}" {% if selected_specialty==s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+
+        <div class="card-grid">
+            {% for h in hospitals %}
+            <a href="/hospital/{{ h.id }}" class="hospital-card glass-card">
+                <div class="hcard-header">
+                    <img src="{{ h.image }}" alt="{{ h.name }}" class="hcard-img">
+                    <span class="hcard-rating">⭐ {{ h.rating }} <small>({{ h.review_count }})</small></span>
+                </div>
+                <div class="hcard-body">
+                    <h3>{{ h.name }}</h3>
+                    <p class="hcard-loc">📍 {{ h.city }}, {{ h.country }}</p>
+                    <p class="hcard-desc">{{ h.description[:140] }}…</p>
+                    <div class="hcard-tags">{% for s in h.specialties|from_json %}<span class="tag">{{ s }}</span>{% endfor %}</div>
+                    <div class="hcard-accred">{% for a in h.accreditations|from_json %}<span class="tag tag-cert">✅ {{ a }}</span>{% endfor %}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% if not hospitals %}<div class="empty-state glass-card"><div class="empty-icon">🏥</div><h2>No hospitals found</h2><p>Try adjusting your filters.</p></div>{% endif %}
+    </div>
+</section>
+{% endblock %}

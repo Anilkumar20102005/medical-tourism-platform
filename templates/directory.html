@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Doctor Directory — HealinBelieve{% endblock %}
+
+{% block content %}
+<section class="section directory-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Our Specialists</span>
+            <h1>World-Class <span class="gradient-text">Doctor Directory</span></h1>
+            <p class="section-subtitle">Browse our network of internationally accredited specialists across 5 countries.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar glass-card" id="filterBar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Orthopedics">🦴 Orthopedics</button>
+            <button class="filter-btn" data-filter="Cardiology">❤️ Cardiology</button>
+            <button class="filter-btn" data-filter="Dermatology">🧴 Dermatology</button>
+            <button class="filter-btn" data-filter="Neurology">🧠 Neurology</button>
+            <button class="filter-btn" data-filter="Oncology">🎗️ Oncology</button>
+            <button class="filter-btn" data-filter="Ophthalmology">👁️ Ophthalmology</button>
+        </div>
+
+        <!-- Doctor grid -->
+        <div class="doctor-grid" id="doctorGrid">
+            {% for doc in doctors %}
+            <div class="doctor-card glass-card" data-specialty="{{ doc.specialty }}">
+                <div class="doctor-card-header">
+                    <img src="{{ doc.image }}" alt="{{ doc.name }}" class="doctor-avatar">
+                    <span class="doctor-flag">{{ doc.flag }}</span>
+                    <span class="doctor-specialty-badge">{{ doc.specialty }}</span>
+                </div>
+                <div class="doctor-card-body">
+                    <h3>{{ doc.name }}</h3>
+                    <p class="doctor-location">📍 {{ doc.city }}, {{ doc.country }}</p>
+                    <div class="doctor-rating">
+                        <span class="stars">
+                            {% for _ in range(doc.rating | int) %}⭐{% endfor %}
+                        </span>
+                        <span>{{ doc.rating }} ({{ doc.reviews }})</span>
+                    </div>
+                    <div class="doctor-stats">
+                        <div class="doc-stat">
+                            <span class="doc-stat-val">{{ doc.experience_years }}</span>
+                            <span class="doc-stat-lbl">Years Exp</span>
+                        </div>
+                        <div class="doc-stat">
+                            <span class="doc-stat-val">${{ doc.consultation_fee }}</span>
+                            <span class="doc-stat-lbl">Consult Fee</span>
+                        </div>
+                        <div class="doc-stat">
+                            <span class="doc-stat-val">{{ doc.languages | length }}</span>
+                            <span class="doc-stat-lbl">Languages</span>
+                        </div>
+                    </div>
+                    <p class="doctor-bio">{{ doc.bio[:120] }}…</p>
+                    <div class="doctor-certs">
+                        {% for cert in doc.certifications[:2] %}
+                        <span class="tag tag-cert">📜 {{ cert }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="doctor-langs">
+                        🗣️ {{ doc.languages | join(', ') }}
+                    </div>
+                </div>
+                <div class="doctor-card-footer">
+                    <a href="/finder" class="btn btn-primary btn-sm btn-block">Get Matched →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

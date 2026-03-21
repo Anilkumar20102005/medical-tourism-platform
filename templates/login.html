@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Login — HealinBelieve{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <h1>Welcome <span class="gradient-text">Back</span></h1>
+                <p>Log in to access your dashboard</p>
+            </div>
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block btn-glow">Log In</button>
+            </form>
+            <p class="auth-footer">Don't have an account? <a href="/register">Sign up →</a></p>
+            <div class="demo-accounts glass-card">
+                <h4>Demo Accounts</h4>
+                <div class="demo-grid">
+                    <div class="demo-item"><strong>Admin</strong><small>admin@healinbelieve.com / admin123</small></div>
+                    <div class="demo-item"><strong>Patient</strong><small>patient@example.com / patient123</small></div>
+                    <div class="demo-item"><strong>Hospital</strong><small>info@apollo.com / hospital123</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
