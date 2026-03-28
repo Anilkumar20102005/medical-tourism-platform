@@ -482,7 +482,7 @@ def api_doctors():
     doctors = Doctor.query.filter_by(is_active=True).all()
     out = []
     for d in doctors:
-        h = Hospital.query.get(d.hospital_id)
+        h = db.session.get(Hospital, d.hospital_id)
         out.append({
             'id': d.id, 'name': d.name, 'specialty': d.specialty,
             'hospital': h.name if h else '', 'country': h.country if h else '',
@@ -512,9 +512,10 @@ def add_review(hospital_id):
     db.session.add(review)
     # Update hospital rating
     h = db.session.get(Hospital, hospital_id)
+    db.session.flush()  # ensure the new review is persisted before re-querying
     reviews = Review.query.filter_by(hospital_id=hospital_id).all()
-    h.review_count = len(reviews) + 1
-    h.rating = round(sum(r.rating for r in reviews) / len(reviews), 1) if reviews else rating
+    h.review_count = len(reviews)
+    h.rating = round(sum(r.rating for r in reviews) / len(reviews), 1)
     db.session.commit()
     flash('Thank you for your review!', 'success')
     return redirect(url_for('hospital_detail', hospital_id=hospital_id))
@@ -528,7 +529,6 @@ with app.app_context():
     db.create_all()
     seed_database()
 
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

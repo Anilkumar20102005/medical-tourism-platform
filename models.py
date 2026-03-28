@@ -58,11 +58,11 @@ class Hospital(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    user = db.relationship('User', backref='hospital_profile')
-    doctors = db.relationship('Doctor', backref='hospital', lazy=True)
-    treatments = db.relationship('Treatment', backref='hospital', lazy=True)
-    packages = db.relationship('Package', backref='hospital', lazy=True)
-    appointments = db.relationship('Appointment', backref='hospital', lazy=True)
+    user = db.relationship('User', backref=db.backref('hospital_profile', cascade='all, delete-orphan'))
+    doctors = db.relationship('Doctor', backref='hospital', lazy=True, cascade='all, delete-orphan')
+    treatments = db.relationship('Treatment', backref='hospital', lazy=True, cascade='all, delete-orphan')
+    packages = db.relationship('Package', backref='hospital', lazy=True, cascade='all, delete-orphan')
+    appointments = db.relationship('Appointment', backref='hospital', lazy=True, cascade='all, delete-orphan')
 
 
 class Doctor(db.Model):
